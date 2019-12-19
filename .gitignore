@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+.env
+.DS_Store
+.history
+.docker-compose.yml
+.env-config.js

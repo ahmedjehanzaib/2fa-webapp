@@ -1,0 +1,24 @@
+{
+    "version" : "2.7.2",
+    "compilerOptions": {
+      "sourceMap": true,
+      "strictNullChecks": true,
+      "module": "commonjs",
+      "allowSyntheticDefaultImports": true,
+      "experimentalDecorators": true,
+      "allowJs": true,
+      "jsx": "react",
+      "noUnusedParameters": true,
+      "noUnusedLocals": true,
+      "noImplicitAny": false,
+      "target": "es6",
+      "lib": [
+        "dom",
+        "es2015"
+      ],
+      "baseUrl": "./"
+    },
+    "files": [
+        "./src/index.tsx"
+    ]
+  }

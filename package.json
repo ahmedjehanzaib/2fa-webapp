@@ -1,0 +1,81 @@
+{
+  "name": "simplus-auth-account-web",
+  "version": "1.0.0",
+  "description": "Simplus Auth Home and User management Application",
+  "main": "build/ma.js",
+  "sideEffects": false,
+  "dependencies": {
+    "@material-ui/core": "4.2.1",
+    "@material-ui/icons": "4.2.1",
+    "@material-ui/lab": "^4.0.0-alpha.30",
+    "@simplus/base-ts-utils": "1.0.6",
+    "@simplus/robin": "^1.3.13",
+    "@simplus/robin-react": "^1.0.8",
+    "@types/react": "16.8.6",
+    "@types/react-dom": "16.8.4",
+    "@types/react-router": "5.0.1",
+    "@types/react-router-dom": "4.3.4",
+    "axios": "0.19.0",
+    "brace": "^0.11.1",
+    "env-cmd": "^10.0.1",
+    "history": "4.10.1",
+    "json2csv": "^4.5.4",
+    "material-table": "^1.50.0",
+    "react-ace": "^8.0.0",
+    "react-router-dom": "5.0.1",
+    "universal-cookie": "4.0.2",
+    "url": "^0.11.0"
+  },
+  "theme": {
+    "primary-color": "#3FCC8C",
+    "secondary-color": "#AEF78E",
+    "primary-gradient-color": "#3FCC8C",
+    "secondary-gradient-color": "#AEF78E"
+  },
+  "peerDependencies": {
+    "@types/react": "16.8.6",
+    "@types/react-dom": "16.8.4",
+    "react": "16.8.6",
+    "react-dom": "16.8.6"
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.0.2",
+    "babel-loader": "7.1.4",
+    "copy-webpack-plugin": "4.5.1",
+    "cross-env": "5.1.3",
+    "css-loader": "0.28.10",
+    "dotenv-webpack": "1.6.0",
+    "html-loader": "0.5.5",
+    "html-webpack-plugin": "3.0.6",
+    "imagemin-webpack-plugin": "2.4.2",
+    "less": "3.9.0",
+    "less-loader": "4.1.0",
+    "mini-css-extract-plugin": "0.7.0",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "style-loader": "0.20.3",
+    "ts-import-plugin": "1.5.4",
+    "ts-loader": "4.0.1",
+    "tslint": "5.9.1",
+    "typescript": "3.0.1",
+    "uglifyjs-webpack-plugin": "1.3.0",
+    "webpack": "4.5.0",
+    "webpack-bundle-analyzer": "2.11.1",
+    "webpack-cli": "2.0.14",
+    "webpack-dev-server": "3.7.2"
+  },
+  "scripts": {
+    "start": "set NODE_ENV=development && webpack-dev-server --no-inline",
+    "build": "set NODE_ENV=production && webpack -p --display-error-details",
+    "test": "tslint --project tslint.json 'src/**/*.ts'",
+    "lint": "tslint --project tslint.json 'src/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/simplusinnovation/simplus-auth-account-web.git"
+  },
+  "author": "Ahmed Jehanzaib",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/simplusinnovation/simplus-auth-account-web#readme"
+}

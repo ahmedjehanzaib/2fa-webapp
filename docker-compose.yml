@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v1.7
+    container_name: production_traefik
+    command: --api --docker --docker.exposedbydefault=false --loglevel="DEBUG"
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#      - ./traefik.toml:/traefik.toml
+     # - /opt/traefik/certs/:/certs/
+    ports:
+      - 80:80
+      - 8080:8080
+    networks:
+      - bridge
+
+  simplus-auth-web:
+    #image: simplusinnov/simplus-auth-admin-web:TEST
+    build: ./
+    container_name: simplus-auth-web
+    restart: always
+    # volumes:
+    #  - /Users/ahmedjehanzaib/Simplus/Projects/DAC/env-config.js:/Users/ahmedjehanzaib/Simplus/Projects/DAC/simplus-auth-admin-web/env-config.js
+    labels:
+      traefik.backend: 'simplus-auth-web'
+      traefik.enable: 'true'
+      traefik.port: '80'
+      traefik.frontend.backend: 'simplus-auth-web'
+      traefik.frontend.rule: 'PathPrefix:/'
+    networks:
+      - bridge
+networks:
+  bridge:
+    driver: bridge

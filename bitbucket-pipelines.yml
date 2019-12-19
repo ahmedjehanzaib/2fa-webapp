@@ -1,0 +1,63 @@
+# This is a sample build configuration for JavaScript.
+# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:12-alpine
+
+pipelines:
+ default:
+      - step:
+            name: Default
+            caches:
+              - node
+            script: 
+              - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+              - npm install
+              - npm test
+              - npm run build
+ branches:
+    master:
+      - step:
+          name: Deploy to master
+          caches:
+            - node
+          script:
+            - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+            - npm install
+            - npm test
+            - npm run build
+    TEST:
+      - step:
+          name: Deploy to test
+          deployment: test
+          caches:
+            - node
+          script: 
+            - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+            - npm install
+            - npm test
+            - npm run build
+    QA:
+      - step:
+            name: Deploy to pre-prod
+            deployment: staging
+            caches:
+              - node
+            script: 
+              - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+              - npm install
+              - npm test
+              - npm run build
+    PROD:
+      - step:
+            name: Deploy to production
+            deployment: production
+            caches:
+              - node
+            script: 
+              - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+              - npm install
+              - npm test
+              - npm run build
+#test
