@@ -127,7 +127,7 @@ const Header = ({...props}) => {
 									/>
 								</ListItemAvatar>
 								<ListItemText
-									primary={'Ahmed jehanzaib'}
+									primary={userInfo.name}
 									secondary={
 									<React.Fragment>
 										View profile
