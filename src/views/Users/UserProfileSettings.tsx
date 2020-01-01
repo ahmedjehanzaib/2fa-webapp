@@ -126,8 +126,8 @@ const UserProfileSettings = (props) => {
 				...userProfile,
 				name: userInfo.name,
 				pictureUrl: userInfo.picture_url ? userInfo.picture_url : '',
-				contactNo: Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.contact_no : '',
-				address: Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.address : '',
+				contactNo: userInfo.meta_data && Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.contact_no : '',
+				address: userInfo.meta_data && Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.address : '',
 			})
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
