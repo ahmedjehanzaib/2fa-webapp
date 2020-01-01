@@ -1,6 +1,8 @@
 import React, { useEffect, SyntheticEvent } from 'react';
 import clsx from 'clsx';
-import { SaveTwoTone } from '@material-ui/icons';
+import axios from 'axios';
+import * as uuidv4 from 'uuid/v4';
+import { SaveTwoTone, PhotoCamera } from '@material-ui/icons';
 import {
 	makeStyles,
 	Theme,
@@ -12,7 +14,10 @@ import {
 	Tab,
 	TextField,
 	Button,
-	CircularProgress
+	CircularProgress,
+	Badge,
+	IconButton,
+	Avatar
 } from '@material-ui/core';
 import { } from '@material-ui/icons';
 import { connectRobin } from '@simplus/robin-react';
@@ -32,6 +37,8 @@ interface TabPanelProps {
 interface UserProfileState {
 	name: string;
 	pictureUrl: string;
+	contactNo: string;
+	address: string;
 }
 
 const TabPanel = (props: TabPanelProps) => {
@@ -76,6 +83,19 @@ const useStyles = makeStyles((theme: Theme) => ({
 	progress: {
 		margin: theme.spacing(2),
 	},
+	input: {
+		display: 'none',
+	},
+	bigAvatar: {
+		width: 150,
+		height: 150,
+	},
+	fabProgress: {
+		position: 'absolute',
+		top: 12,
+		left: 12,
+		zIndex: 1,
+	},
 }))
 
 @connectRobin([SimplusAuthRobin])
@@ -84,7 +104,9 @@ const UserProfileSettings = (props) => {
 	const [value, setValue] = React.useState(0);
 	const [userProfile, setUserProfile] = React.useState<UserProfileState>({
 		name: '',
-		pictureUrl: ''
+		pictureUrl: '',
+		contactNo: '',
+		address: ''
 	});
 	const [loading, setLoading] = React.useState(true);
 	const [notification, setNotification] = React.useState({
@@ -92,6 +114,7 @@ const UserProfileSettings = (props) => {
 		toastVariant: undefined,
 		toastMessage: undefined
 	});
+	const [fileUploading, setfileUploading] = React.useState(false);
 	const adminId = (props.match && props.match.params.userId) ? props.match.params.userId : undefined;
 
 	const getAdminInfo = (id) => {
@@ -102,7 +125,9 @@ const UserProfileSettings = (props) => {
 			setUserProfile({
 				...userProfile,
 				name: userInfo.name,
-				pictureUrl: userInfo.picture_url ? userInfo.picture_url : ''
+				pictureUrl: userInfo.picture_url ? userInfo.picture_url : '',
+				contactNo: Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.contact_no : '',
+				address: Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.address : '',
 			})
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
@@ -134,12 +159,39 @@ const UserProfileSettings = (props) => {
 		event.preventDefault();
 		SimplusAuthRobin.when(SimplusAuthRobin.put('updateAdminInfo', `/users/${adminId}`, {
 			name: userProfile.name,
-			picture_url: userProfile.pictureUrl
+			picture_url: userProfile.pictureUrl,
+			meta_data: {
+				contact_no: userProfile.contactNo,
+				address: userProfile.address
+			}
 		})).then(() => {
 			const updatedInfo = SimplusAuthRobin.getResult('updateAdminInfo');
 			handleToastOpen('success', updatedInfo.message);
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
+		})
+	}
+
+	const onfilechange = (e) => {
+		setfileUploading(true);
+		const formData = new FormData()
+		formData.append('file', e.target.files[0] as any)
+		formData.append('public_id', uuidv4())
+		formData.append('upload_preset', 'p4f97hzq')
+		axios({
+			url : '/v1_1/dfprwegge/upload',
+			method : 'POST',
+			headers : {
+				'Content-Type' : 'application/x-www-form-urlencoded'
+			},
+			baseURL: 'https://api.cloudinary.com',
+			data : formData
+		}).then( (res) => {
+			setUserProfile({ ...userProfile, pictureUrl: res.data.secure_url });
+			setfileUploading(false);
+		}).catch( () => {
+			setfileUploading(false);
+			handleToastOpen('error', 'Error in uploading your photo!')
 		})
 	}
 
@@ -152,10 +204,43 @@ const UserProfileSettings = (props) => {
 	}, [])
 	return (<ErrorBoundary>
 		<CustomizedSnackbars open={notification.toastOpen} variant={notification.toastVariant} message={notification.toastMessage} handleToastClose={handleToastClose}/>
+		<Grid container justify='center' alignItems='center'>
+			<Grid item>
+				<Badge
+					overlap='circle'
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'right',
+					}}
+					badgeContent={
+						<div>
+							<input accept="image/*" className={classes.input} id="icon-button-file" type="file" onChange= {onfilechange} />
+							<label 
+								htmlFor="icon-button-file"
+							>
+								<IconButton color="default" aria-label="upload picture" component="span">
+									<PhotoCamera />
+									{fileUploading && <CircularProgress size={24} color="secondary" className={classes.fabProgress} />}
+								</IconButton>
+							</label>
+						</div>
+					}
+				>
+					<Avatar alt={'simplus-logo'} src={userProfile.pictureUrl ? userProfile.pictureUrl : 'https://i.ibb.co/2kcsxxB/avatar.png'} className={classes.bigAvatar}/>
+				</Badge>
+			</Grid>
+		</Grid>
 		<Grid container>
-			<Typography variant='h5' display='block' gutterBottom={true}>
-				Your Profile Settings
-			</Typography>
+			<Grid item xs={12}>
+				<Typography variant='h5' display='block' gutterBottom={true}>
+					Personal Information
+				</Typography>
+			</Grid>
+			<Grid item xs={12}>
+				<Typography variant='caption' display='block' gutterBottom={true}>
+					Some basic info, like your name and photo. 
+				</Typography>
+			</Grid>
 		</Grid>
 		<Grid container>
 			<AppBar position='static' color='default'>
@@ -173,6 +258,18 @@ const UserProfileSettings = (props) => {
 		{loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
 			<TabPanel value={value} index={0}>
 				<form className={classes.form} autoComplete='off' onSubmit={submitUserProfileSettings}>
+					{/* <TextField
+						variant='filled'
+						margin='normal'
+						fullWidth
+						id='pictureUrl'
+						label='Photo'
+						type='text'
+						value={userProfile.pictureUrl}
+						name='Photo'
+						autoComplete='pictureUrl'
+						onChange={handleFormChange('pictureUrl')}
+					/> */}
 					<TextField
 						variant='filled'
 						margin='normal'
@@ -191,13 +288,25 @@ const UserProfileSettings = (props) => {
 						variant='filled'
 						margin='normal'
 						fullWidth
-						id='pictureUrl'
-						label='pictureUrl'
+						id='phone'
+						label='Phone'
 						type='text'
-						value={userProfile.pictureUrl}
-						name='pictureUrl'
-						autoComplete='pictureUrl'
-						onChange={handleFormChange('pictureUrl')}
+						value={userProfile.contactNo}
+						name='Phone'
+						autoComplete='Phone'
+						onChange={handleFormChange('contactNo')}
+					/>
+					<TextField
+						variant='filled'
+						margin='normal'
+						fullWidth
+						id='address'
+						label='Address'
+						type='text'
+						value={userProfile.address}
+						name='address'
+						autoComplete='Address'
+						onChange={handleFormChange('address')}
 					/>
 					<div style={{float: 'right'}}>
 						<Button
