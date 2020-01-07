@@ -91,7 +91,7 @@ const Header = ({...props}) => {
 						<Avatar alt={'simplus-logo'} src={'/src/assets/img/simplus-logo.png'} className={classes.bigAvatar} />	
 					</a>
 					<Typography variant='h6' noWrap>
-						AUTH
+						Account
 					</Typography>
 				</div>
 				<div>
