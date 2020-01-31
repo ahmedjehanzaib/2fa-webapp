@@ -167,6 +167,9 @@ const UserProfileSettings = (props) => {
 		})).then(() => {
 			const updatedInfo = SimplusAuthRobin.getResult('updateAdminInfo');
 			handleToastOpen('success', updatedInfo.message);
+			setTimeout(() => {
+				props.history.push('/');
+			}, 2000)
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
 		})
@@ -196,7 +199,7 @@ const UserProfileSettings = (props) => {
 	}
 
 	const onCancel = () => {
-		getAdminInfo(adminId)
+		props.history.push('/');
 	}
 
 	useEffect(() => {

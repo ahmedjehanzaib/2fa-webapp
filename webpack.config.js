@@ -110,7 +110,7 @@ module.exports = {
     },
     devServer: {
         historyApiFallback: true,
-        host: 'dac-account-web.simplus.local'
+        host: 'account-web.simplus.local'
     },
     optimization : {
         minimize : IS_PROD,
