@@ -44,8 +44,8 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		bigAvatar: {
 			margin: 10,
-			width: 50,
-			height: 50,
+			width: 35,
+			height: 35,
 		},
 	}),
 );
@@ -88,7 +88,7 @@ const Header = ({...props}) => {
 						href='/'
 						style={{ textDecoration: 'none' }}
 					>
-						<Avatar alt={'simplus-logo'} src={'/src/assets/img/simplus-logo.png'} className={classes.bigAvatar} />	
+						<Avatar alt={'simplus-logo'} src={'/src/assets/img/favicon.png'} className={classes.bigAvatar} />	
 					</a>
 					<Typography variant='h6' noWrap>
 						Account
