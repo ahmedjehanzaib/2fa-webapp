@@ -69,6 +69,7 @@ const Header = ({...props}) => {
 	}
 
 	const handleLogout = () => {
+		console.log('--->user info', userInfo)
 		window.location.replace(`${userInfo.fromClient ? userInfo.fromClient: window.location.origin}/auth/logout`)
 	}
  
