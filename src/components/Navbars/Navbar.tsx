@@ -69,7 +69,7 @@ const Header = ({...props}) => {
 	}
 
 	const handleLogout = () => {
-		window.location.replace(`${window.location.origin}/auth/logout`)
+		window.location.replace(`${userInfo.fromClient ? userInfo.fromClient: window.location.origin}/auth/logout`)
 	}
  
 	const handleMenuItemClick = (redirectTo) => {
