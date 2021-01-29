@@ -9,6 +9,7 @@ import routes from '../routes';
 import Navbar from '../components/Navbars/Navbar';
 import UserProfile from '../views/Users/UserProfile';
 import UserProfileSettings from '../views/Users/UserProfileSettings';
+import TwoStepVerification from '../views/Users/TwoStepVerification';
 import NotPermitted from '../views/NotPermitted/NotPermitted';
 import { robins } from '../robins';
 import { ErrorBoundary } from 'src/utils/ErrorBoundary';
@@ -20,6 +21,7 @@ const switchRoutes = (props) => (
 		<Route exact path='/admin/not-permitted' component={NotPermitted} />
 		<Route exact path='/admin/profile/:userId' render={(props) => <UserProfile {...props} />} />
 		<Route exact path='/admin/profile/:userId/settings' render={(props) => <UserProfileSettings {...props} />} />
+		<Route exact path='/admin/user/:userId/security/two-step-verification' render={(props) => <TwoStepVerification {...props} />} />
 		{routes.map((prop, key) => {
 				if (prop.layout === '/admin') {
 					return (
@@ -35,7 +37,7 @@ const switchRoutes = (props) => (
 				}
 				return null;
 			})}
-		<Redirect from='/admin' to='/admin/dashboard' />
+		<Redirect from='/admin' to='/admin/home' />
 	</Switch>
 );
 
@@ -64,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 @connectRobin([SimplusAuthRobin])
 const Admin = (props: any): JSX.Element => {
-	const classes = useStyles();
+	const classes = useStyles(props);
 	// Getting loggedInUser information
 	const getLoggedInUser = () => {
 		return SimplusAuthRobin.getResult('loggedInUserInfo');

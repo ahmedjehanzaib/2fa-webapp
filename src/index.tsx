@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import axios from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import CustomizeThemeProvider from './views/CustomizeThemeProvider/CustomizeThemeProvider';

@@ -2,7 +2,7 @@ import React, { useEffect, SyntheticEvent } from 'react';
 import clsx from 'clsx';
 import axios from 'axios';
 import * as uuidv4 from 'uuid/v4';
-import { SaveTwoTone, PhotoCamera } from '@material-ui/icons';
+import { SaveTwoTone, PhotoCamera, CancelTwoTone, CheckCircleTwoTone } from '@material-ui/icons';
 import {
 	makeStyles,
 	Theme,
@@ -17,9 +17,15 @@ import {
 	CircularProgress,
 	Badge,
 	IconButton,
-	Avatar
+	Avatar,
+	Paper,
+	ListItemIcon,
+	List,
+	ListItem,
+	ListItemSecondaryAction,
+	ListItemText
 } from '@material-ui/core';
-import { } from '@material-ui/icons';
+import { ChevronRightOutlined, SecurityOutlined } from '@material-ui/icons';
 import { connectRobin } from '@simplus/robin-react';
 
 import { robins } from '../../robins';
@@ -39,6 +45,7 @@ interface UserProfileState {
 	pictureUrl: string;
 	contactNo: string;
 	address: string;
+	twoStepVerificationEnabled: boolean;
 }
 
 const TabPanel = (props: TabPanelProps) => {
@@ -96,6 +103,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 		left: 12,
 		zIndex: 1,
 	},
+	demo: {
+		backgroundColor: theme.palette.background.paper,
+	},
 }))
 
 @connectRobin([SimplusAuthRobin])
@@ -106,7 +116,8 @@ const UserProfileSettings = (props) => {
 		name: '',
 		pictureUrl: '',
 		contactNo: '',
-		address: ''
+		address: '',
+		twoStepVerificationEnabled: false
 	});
 	const [loading, setLoading] = React.useState(true);
 	const [notification, setNotification] = React.useState({
@@ -128,6 +139,7 @@ const UserProfileSettings = (props) => {
 				pictureUrl: userInfo.picture_url ? userInfo.picture_url : '',
 				contactNo: userInfo.meta_data && Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.contact_no : '',
 				address: userInfo.meta_data && Object.keys(userInfo.meta_data).length > 0 ? userInfo.meta_data.address : '',
+				twoStepVerificationEnabled: userInfo.two_step_verification_enabled
 			})
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
@@ -202,6 +214,10 @@ const UserProfileSettings = (props) => {
 		props.history.push('/');
 	}
 
+	const goTo = (path: string) => {
+		props.history.push(path);
+	}
+
 	useEffect(() => {
 		getAdminInfo(adminId)
 	}, [])
@@ -233,15 +249,15 @@ const UserProfileSettings = (props) => {
 				</Badge>
 			</Grid>
 		</Grid>
-		<Grid container>
+		<Grid container justify='center' alignItems='center'>
 			<Grid item xs={12}>
-				<Typography variant='h5' display='block' gutterBottom={true}>
-					Personal Information
+				<Typography align='center' variant='h5' display='block' gutterBottom={true}>
+					Welcome, { userProfile.name }
 				</Typography>
 			</Grid>
 			<Grid item xs={12}>
-				<Typography variant='caption' display='block' gutterBottom={true}>
-					Some basic info, like your name and photo. 
+				<Typography align='center' variant='caption' display='block' gutterBottom={true}>
+					Manage your info and security to make Leza work better for you.
 				</Typography>
 			</Grid>
 		</Grid>
@@ -256,10 +272,23 @@ const UserProfileSettings = (props) => {
 				aria-label='scrollable auto tabs example'
 				>
 					<Tab label='Profile' {...a11yProps(0)} />
+					<Tab label='Security' {...a11yProps(1)} />
 				</Tabs>
 			</AppBar>
-		{loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
+			{loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
 			<TabPanel value={value} index={0}>
+				<Grid container>
+					{/* <Grid item xs={12}>
+						<Typography variant='h5' display='block' gutterBottom={true}>
+							Personal Information
+						</Typography>
+					</Grid> */}
+					<Grid item xs={12}>
+						<Typography variant='caption' display='block' gutterBottom={true}>
+							Some basic info, like your name and photo. 
+						</Typography>
+					</Grid>
+				</Grid>
 				<form className={classes.form} autoComplete='off' onSubmit={submitUserProfileSettings}>
 					{/* <TextField
 						variant='filled'
@@ -335,7 +364,61 @@ const UserProfileSettings = (props) => {
 					</div>
 				</form>
 			</TabPanel>
-		}
+			}
+			<TabPanel value={value} index={1}>
+				<Grid container>
+					{/* <Grid item xs={12}>
+						<Typography variant='h5' display='block' gutterBottom={true}>
+							Personal Information
+						</Typography>
+					</Grid> */}
+					<Grid item xs={12}>
+						<Typography variant='caption' display='block' gutterBottom={true}>
+							Settings and recommendations to help you keep your account secure. 
+						</Typography>
+					</Grid>
+				</Grid>
+				<Paper variant="outlined" elevation={2}>
+					<Grid container>
+						<Grid item xs={12}>
+							<Typography variant='h5' display='block' gutterBottom={true} style={{ padding: '15px'}}>
+								Signing in to Leza
+							</Typography>
+						</Grid>
+						<Grid item xs={12}>
+							<List component="nav">
+								<ListItem button onClick={() => goTo(`/challenge/pwd`)}>
+									<ListItemIcon>
+										<SecurityOutlined/>
+									</ListItemIcon>
+									<ListItemText
+										primary="2 Step Verification"
+									/>
+									<ListItemText
+										primary={
+											userProfile.twoStepVerificationEnabled ?
+											<div style={{ display: 'flex' }}>
+												<div style={{ marginRight: '5px', fontWeight: 'bolder'}}>ON</div>
+												<div><CheckCircleTwoTone style={{ color: 'green'}}></CheckCircleTwoTone></div>
+											</div>
+											:
+											<div style={{ display: 'flex' }}>
+												<div style={{ marginRight: '5px', fontWeight: 'bolder'}}>OFF</div>
+												<div><CancelTwoTone style={{ color: 'red'}}></CancelTwoTone></div>
+											</div>
+										}
+									/>
+									<ListItemSecondaryAction>
+										<IconButton edge="end" aria-label="select" onClick={() => goTo(`/challenge/pwd`)}>
+											<ChevronRightOutlined />
+										</IconButton>
+									</ListItemSecondaryAction>
+								</ListItem>
+							</List>
+						</Grid>
+					</Grid>
+				</Paper>
+			</TabPanel>
 		</Grid>
 	</ErrorBoundary>);
 };
