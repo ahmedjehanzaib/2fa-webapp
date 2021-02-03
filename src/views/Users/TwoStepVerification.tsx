@@ -5,7 +5,6 @@ import {
 	Paper,
 	Typography,
 	Grid,
-	CircularProgress,
 	FormControlLabel,
 	Switch,
 	Divider,
@@ -17,6 +16,7 @@ import {
 	IconButton
 } from '@material-ui/core';
 import { connectRobin } from '@simplus/robin-react';
+const queryString = require('query-string');
 
 import { robins } from '../../robins';
 import CustomizedSnackbars from '../../components/Toast/Toast';
@@ -65,17 +65,32 @@ const TwoStepVerification = ({...props}) => {
 	
 	const handleChange = (event) => {
 		setTwoStepVerificationSwitch({ ...twoStepVerificationSwitch, [event.target.name]: event.target.checked });
-		
-		SimplusAuthRobin.when(SimplusAuthRobin.post('userTwoStepVerificationSwitch', `/users/security/two-step-verification/toggle`, {
-			"userId": userId,
-    		"twoStepVerificationSwitch": event.target.checked
-		})).then(() => {
-			const response = SimplusAuthRobin.getResult('userTwoStepVerificationSwitch').data;
-			handleToastOpen('success', 'Two step verification setting has been updated!');
-			getAdminInfo(userId)
-		}).catch(err => {
-			handleToastOpen('error', err.response.data.message)
-		})
+		const parsed = queryString.parse(props.history.location.search);
+		if (parsed.challenge) {
+			SimplusAuthRobin.when(SimplusAuthRobin.post('userTwoStepVerificationSwitch', `/users/security/two-step-verification/toggle`, {
+				"userId": userId,
+				"twoStepVerificationSwitch": event.target.checked,
+				"securityViewTimePeriod": parsed.challenge
+			})).then(() => {
+				const response = SimplusAuthRobin.getResult('userTwoStepVerificationSwitch').data;
+				handleToastOpen('success', 'Two step verification setting has been updated!');
+				getAdminInfo(userId)
+			}).catch(err => {
+				if (err.response.status == 400 && err.response.data.error.name == 'TokenExpiredError') {
+					handleToastOpen('warning', 'Enter your password again to verify you!')
+					setTimeout(() => {
+						props.history.push(`/challenge/pwd`)
+					}, 2000)
+				} else {
+					handleToastOpen('error', err.response.data.message)
+				}
+			})
+		} else {
+			handleToastOpen('error', 'Invalid request!');
+			setTimeout(() => {
+				props.history.push(`/challenge/pwd`)
+			}, 2000)
+		}
 	};
 
 	const handleChangeTwoStepVerificationTypes = (event) => {

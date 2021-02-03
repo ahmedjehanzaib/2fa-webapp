@@ -112,8 +112,9 @@ const Password = (props) => {
         };
         
         SimplusAuthRobin.when(SimplusAuthRobin.post('verifyUserPassword', `/users/verify-user-password`, user)).then(() => {
-            SimplusAuthRobin.getResult('verifyUserPassword');
-            props.history.push(`/admin/user/${values.userId}/security/two-step-verification`)
+            const response = SimplusAuthRobin.getResult('verifyUserPassword');
+            const securityViewTimePeriod = response.data.securityViewTimePeriod
+            props.history.push(`/admin/user/${values.userId}/security/two-step-verification?challenge=${securityViewTimePeriod}`)
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
         })
