@@ -6,6 +6,7 @@ import { Switch, Route, Redirect } from 'react-router';
 import { ErrorBoundary } from 'src/utils/ErrorBoundary';
 
 import Admin from '../../layouts/Admin';
+import Password from '../VerifyUser/Password';
 import { robins } from '../../robins';
 import CustomizedSnackbars from 'src/components/Toast/Toast';
 
@@ -55,6 +56,7 @@ const CustomizeThemeProvider = () => {
                 Object.keys(userInfo).length > 0 ? 
                 <ThemeProvider theme={createMuiTheme({})}>
                         <Switch>
+                            <Route path={`/challenge/pwd`} render={(props) => <Password {...props} />} />
                             <Route path='/admin' component={Admin} />
                             <Redirect from='/' 
                                 to={'/admin/home'}
