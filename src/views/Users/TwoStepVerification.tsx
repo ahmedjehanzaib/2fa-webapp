@@ -61,6 +61,9 @@ const TwoStepVerification = ({...props}) => {
 		viaSms: false,
 		viaAuthenticatorApp: false
 	})
+	const [userInfo, setUserInfo] = React.useState({
+		email: ''
+	})
 	const userId = (props.match && props.match.params.userId) ? props.match.params.userId : undefined;
 	
 	const handleChange = (event) => {
@@ -139,6 +142,9 @@ const TwoStepVerification = ({...props}) => {
 			setTwoStepVerificationTypes({
 				...twoStepVerificationTypes, viaEmail: userInfo.two_step_verification_via_email ? userInfo.two_step_verification_via_email : false
 			})
+			setUserInfo({
+				email: userInfo.email ? userInfo.email : ''
+			})
 		}).catch(err => {
 			handleToastOpen('error', err.response.data.message)
 		})
@@ -211,12 +217,12 @@ const TwoStepVerification = ({...props}) => {
 																	{
 																		true ?
 																		<div style={{ display: 'flex' }}>
-																			<div style={{ marginRight: '5px'}}>ahmed@simplusinnovation.com</div>
+																			<div style={{ marginRight: '5px'}}>{userInfo.email}</div>
 																			<div><CheckCircleTwoTone style={{ color: 'green'}}></CheckCircleTwoTone></div>
 																		</div>
 																		:
 																		<div style={{ display: 'flex' }}>
-																			<div style={{ marginRight: '5px'}}>ahmed@simplusinnovation.com</div>
+																			<div style={{ marginRight: '5px'}}>{userInfo.email}</div>
 																			<div><CancelTwoTone style={{ color: 'red'}}></CancelTwoTone></div>
 																		</div>
 																	}
