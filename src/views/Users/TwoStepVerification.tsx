@@ -228,7 +228,7 @@ const TwoStepVerification = ({...props}) => {
 																	}
 																</div>
 															}
-															secondary="Verification codes are sent by email."
+															secondary="Verification codes will sent by email."
 														/>
 														<ListItemSecondaryAction>
 															<FormControlLabel
