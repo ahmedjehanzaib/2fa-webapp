@@ -9,6 +9,7 @@ import Admin from '../../layouts/Admin';
 import Password from '../VerifyUser/Password';
 import { robins } from '../../robins';
 import CustomizedSnackbars from 'src/components/Toast/Toast';
+import { Container, CssBaseline, Avatar, Typography, Button } from '@material-ui/core';
 
 const { SimplusAuthRobin } = robins; 
 
@@ -44,6 +45,10 @@ const CustomizeThemeProvider = () => {
 			handleToastOpen('error', err.response.data.message)
 		})
 	}
+
+    const handleLogout = () => {
+        window.location.replace(`${window.location.origin}/auth/logout`)
+    }
     
     useEffect(() => {
 		fetchLoggedInUser()
@@ -64,7 +69,19 @@ const CustomizeThemeProvider = () => {
                         </Switch>
                 </ThemeProvider> 
                 :
-                null
+                <Container component="main" fixed style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <CssBaseline />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        <Avatar alt='403' variant='square' src='/src/assets/img/403.png' style={{ width: 'auto', height: '300px'}} />
+                        <Typography component='h5' variant='h5' style={{marginTop: '1rem'}}>
+                                403
+                        </Typography>
+                        <Typography variant='subtitle1' color='textSecondary' style={{margin: '1rem 0'}}>
+                            Sorry, the page you are looking for has been restricted. If you want to get access, kindly contact system administrator.
+                        </Typography>
+                        <Button variant='contained' color='primary' size='medium' onClick={handleLogout}>Logout</Button>
+                    </div>
+                </Container>
             }                
 		</ErrorBoundary>
     )
