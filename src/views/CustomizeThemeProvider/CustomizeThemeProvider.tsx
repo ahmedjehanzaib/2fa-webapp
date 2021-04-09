@@ -9,14 +9,22 @@ import Admin from '../../layouts/Admin';
 import Password from '../VerifyUser/Password';
 import { robins } from '../../robins';
 import CustomizedSnackbars from 'src/components/Toast/Toast';
-import { Container, CssBaseline, Avatar, Typography, Button } from '@material-ui/core';
+import { Container, CssBaseline, Avatar, Typography, Button, CircularProgress, makeStyles, Theme } from '@material-ui/core';
 
 const { SimplusAuthRobin } = robins; 
 
+const useStyles = makeStyles((theme: Theme) => ({
+	progress: {
+		margin: theme.spacing(2),
+	}
+}));
 
 @connectRobin([SimplusAuthRobin])
 const CustomizeThemeProvider = () => {
+    const classes = useStyles({});
+
     const [userInfo, setUserInfo] = React.useState({});
+    const [loading, setLoading] = React.useState(false);
     const [notification, setNotification] = React.useState({
 		toastOpen: false,
 		toastVariant: undefined,
@@ -36,12 +44,15 @@ const CustomizeThemeProvider = () => {
 	}
 
     const fetchLoggedInUser = () => {
+        setLoading(true);
 		SimplusAuthRobin.when(SimplusAuthRobin.get('loggedInUserInfo', `/users/info/with-organization`)).then(() => {
+            setLoading(false);
             const userInfo = SimplusAuthRobin.getResult('loggedInUserInfo');
             setUserInfo({
                 ...userInfo.data
             })
 		}).catch(err => {
+            setLoading(false);
 			handleToastOpen('error', err.response.data.message)
 		})
 	}
@@ -58,6 +69,7 @@ const CustomizeThemeProvider = () => {
         <ErrorBoundary>
             <CustomizedSnackbars open={notification.toastOpen} variant={notification.toastVariant} message={notification.toastMessage} handleToastClose={handleToastClose}/>
             {
+                loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
                 Object.keys(userInfo).length > 0 ? 
                 <ThemeProvider theme={createMuiTheme({})}>
                         <Switch>
