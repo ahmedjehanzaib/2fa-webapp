@@ -128,7 +128,7 @@ const TwoStepVerification = ({...props}) => {
 	}
 
 	const handleBackClick = () => {
-		props.history.push(`/admin/profile/${userId}/settings`);
+		props.history.push(`/admin/home`);
 	}
 
 	const getAdminInfo = (id: string) => {

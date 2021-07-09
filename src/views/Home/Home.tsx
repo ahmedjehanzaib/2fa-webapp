@@ -1,19 +1,51 @@
-import React, { useEffect, SyntheticEvent } from 'react';
-const url = require('url');
+import React from 'react';
 import {
 	makeStyles,
 	Theme,
 	Typography,
 	Grid,
-	CircularProgress
+	AppBar,
+	Tab,
+	Tabs,
+	Box
 } from '@material-ui/core';
+import { UserProfile, UserSecurity, UserApplications } from './Tabs';
 import { connectRobin } from '@simplus/robin-react';
-import Avatar from '@material-ui/core/Avatar';
 
 import { robins } from '../../robins';
 import { ErrorBoundary } from 'src/utils/ErrorBoundary';
-import CustomizedSnackbars from 'src/components/Toast/Toast';
 const { SimplusAuthRobin } = robins;
+
+interface TabPanelProps {
+	children?: React.ReactNode;
+	index: any;
+	value: any;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+	const { children, value, index, ...other } = props;
+
+	return (
+	<Typography
+		style={{ flexGrow: 1 }}
+		component='div'
+		role='tabpanel'
+		hidden={value !== index}
+		id={`scrollable-auto-tabpanel-${index}`}
+		aria-labelledby={`scrollable-auto-tab-${index}`}
+		{...other}
+	>
+		<Box p={3}>{children}</Box>
+	</Typography>
+	);
+}
+
+const a11yProps = (index: any) => {
+	return {
+		id: `scrollable-auto-tab-${index}`,
+		'aria-controls': `scrollable-auto-tabpanel-${index}`,
+	};
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
 	root: {
@@ -36,27 +68,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 	},
 }))
 
+//@ts-ignore
 @connectRobin([SimplusAuthRobin])
-const Home = (props) => {
+const Home = (props: any) => {
 	const classes = useStyles();
-	const [loading, setLoading] = React.useState(false);
-	const [applications, setApplications] = React.useState<any>([]);
-	const [notification, setNotification] = React.useState({
-		toastOpen: false,
-		toastVariant: undefined,
-		toastMessage: undefined
-	});
+	const [value, setValue] = React.useState(0);
 
-	const handleToastClose = (_event?: SyntheticEvent, reason?: string) => {
-		if (reason === 'clickaway') {
-			return;
-		}
-
-		setNotification({...notification, toastOpen: false, toastMessage: undefined});
-	}
-
-	const handleToastOpen = (toastVariant, toastMessage) => {
-		setNotification({...notification, toastOpen: true, toastVariant: toastVariant, toastMessage: toastMessage});
+	const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+		setValue(newValue);
 	}
 
 	// Getting loggedInUser information
@@ -64,59 +83,48 @@ const Home = (props) => {
 		return SimplusAuthRobin.getResult('loggedInUserInfo');
 	}
 	const loggedInUser = getLoggedInUser();
-	const userId = loggedInUser ? loggedInUser.data.id : null;
+	const userProfile = loggedInUser.data;
 
-
-	const fetchUserApplications = (userId: (string | null)) => {
-		setLoading(true);
-		SimplusAuthRobin.when(SimplusAuthRobin.get('UserApplications', `/users/${userId}/applications`)).then(() => {
-			setLoading(false);
-			const applications = SimplusAuthRobin.getResult('UserApplications').data;
-			setApplications(applications)
-		}).catch(err => {
-			setLoading(false);
-			handleToastOpen('error', err.response.data.message)
-		})
-	}
-
-	useEffect(() => {
-		fetchUserApplications(userId)
-	}, [])
 	return (
 		<ErrorBoundary>
-			<CustomizedSnackbars open={notification.toastOpen} variant={notification.toastVariant} message={notification.toastMessage} handleToastClose={handleToastClose}/>
 			<div className={classes.root}>
-				<Grid container direction="row" justify="center" alignItems="center" style={{marginBottom: '3rem'}}>
-					<Grid item>
-						<Typography variant='h4' gutterBottom={true}>
-							APPLICATIONS
+				<Grid container justify='center' alignItems='center'>
+					<Grid item xs={12}>
+						<Typography align='center' variant='h5' display='block' gutterBottom={true}>
+							Welcome, { userProfile.name }
+						</Typography>
+					</Grid>
+					<Grid item xs={12}>
+						<Typography align='center' variant='caption' display='block' gutterBottom={true}>
+							Manage your info and security to make Leza work better for you.
 						</Typography>
 					</Grid>
 				</Grid>
-				{loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
-				<Grid container direction="row" justify="center" alignItems="center" spacing={10}>
-					{
-						applications && applications.map((app, index) => {
-							if (app.client_name !== 'DAC') {
-								let applicationUrl = app && app.redirect_uris ? url.parse(app.redirect_uris.split(',')[0], true) : '/';
-								return (
-									<Grid item sm={3} key={index}>
-										<a href={`${applicationUrl.protocol}//${applicationUrl.host}`} style={{ textDecoration: 'none' }}>
-											<div style={{textAlign: 'center'}}>
-												<img style={{  width: '100px'}} src={app && app.logo_url ? app.logo_url: "/src/assets/img/simplus-logo.png"}/>
-												{/* <Avatar alt="Remy Sharp" src={app && app.logo_url ? app.logo_url: "/src/assets/img/simplus-logo.png"} className={classes.bigAvatar} /> */}
-												<Typography variant="subtitle1" display="block" gutterBottom>
-													{app.client_name}
-												</Typography>
-											</div>
-										</a>
-									</Grid>
-								)
-							}
-						})
-					}
+				<Grid container>
+					<AppBar position='static' color='default' elevation={0}>
+						<Tabs
+							value={value}
+							onChange={handleChange}
+							indicatorColor='primary'
+							variant='scrollable'
+							scrollButtons='auto'
+							aria-label='scrollable auto tabs example'
+						>
+							<Tab label='Profile' {...a11yProps(0)} />
+							<Tab label='Security' {...a11yProps(1)} />
+							<Tab label='Your Applications' {...a11yProps(2)} />
+						</Tabs>
+					</AppBar>
+					<TabPanel value={value} index={0}>
+						<UserProfile />
+					</TabPanel>
+					<TabPanel value={value} index={1}>
+						<UserSecurity {...props}/>
+					</TabPanel>
+					<TabPanel value={value} index={2}>
+						<UserApplications />
+					</TabPanel>
 				</Grid>
-				}
 			</div>
 		</ErrorBoundary>
 	)

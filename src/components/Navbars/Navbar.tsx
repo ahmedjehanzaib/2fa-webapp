@@ -79,7 +79,7 @@ const Header = ({...props}) => {
 
 	return (<ErrorBoundary>
 		<AppBar
-			color='primary'
+			style={{ backgroundColor: 'white', color: 'black' }}
 			position='fixed'
 		>
 			<Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -135,13 +135,13 @@ const Header = ({...props}) => {
 									}
 								/>
 						</MenuItem>
-						<Divider light={true} />
+						{/* <Divider light={true} />
 						<MenuItem onClick={() => handleMenuItemClick(`/admin/profile/${userInfo ? userInfo.id : undefined}/settings`)}>
 							<ListItemIcon>
 								<SettingsApplicationsTwoTone />
 							</ListItemIcon>
 							<ListItemText primary='Account Settings' />
-						</MenuItem>
+						</MenuItem> */}
 						<Divider light={true} />
 						<MenuItem onClick={handleLogout}>
 							<ListItemIcon>
