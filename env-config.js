@@ -1,3 +1,2 @@
-window.SIMPLUS = {}
-window.SIMPLUS.SIMPLUS_AUTH_ACCOUNT_SERVER_URL = 'http://account.simplus.com:3008';
-// window.SIMPLUS.SIMPLUS_AUTH_ACCOUNT_SERVER_URL = 'http://localhost:3011';
+window.APP = {}
+window.APP.SERVER_URL = 'http://localhost:3020';

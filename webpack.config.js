@@ -32,7 +32,6 @@ function recursiveIssuer(m) {
         return false;
     }
  }
-console.log("[ENV] ------>",IS_PROD? "PRODUCTION":"DEVELOPMENT")
 
 module.exports = {
     target : "web",
@@ -110,7 +109,7 @@ module.exports = {
     },
     devServer: {
         historyApiFallback: true,
-        host: 'account-web.simplus.com'
+        host: ''
     },
     optimization : {
         minimize : IS_PROD,

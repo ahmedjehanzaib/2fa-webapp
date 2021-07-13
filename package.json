@@ -1,7 +1,7 @@
 {
-  "name": "simplus-auth-account-web",
+  "name": "react-app-with-typescript",
   "version": "1.0.0",
-  "description": "Simplus Auth Home and User management Application",
+  "description": "",
   "main": "build/ma.js",
   "sideEffects": false,
   "dependencies": {
@@ -21,6 +21,7 @@
     "history": "4.10.1",
     "json2csv": "^4.5.4",
     "material-table": "^1.50.0",
+    "query-string": "^7.0.1",
     "react-ace": "^8.0.0",
     "react-router-dom": "5.0.1",
     "universal-cookie": "4.0.2",
@@ -73,9 +74,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/simplusinnovation/simplus-auth-account-web.git"
+    "url": "https://github.com/ahmedjehanzaib/react-app-with-typescript.git"
   },
   "author": "Ahmed Jehanzaib",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/simplusinnovation/simplus-auth-account-web#readme"
+  "homepage": "https://github.com/ahmedjehanzaib/react-app-with-typescript#readme"
 }

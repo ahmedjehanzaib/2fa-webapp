@@ -1,5 +1,6 @@
 import React, { useState, SyntheticEvent } from 'react';
 import clsx from 'clsx';
+const queryString = require('query-string');
 import {
 	Button,
 	CircularProgress,
@@ -7,13 +8,13 @@ import {
 	makeStyles,
 	TextField,
 	Theme,
-	Typography
+    Typography
 } from '@material-ui/core';
 
 import { robins } from '../../robins';
-import { ErrorBoundary } from 'src/utils/ErrorBoundary';
+import { ErrorBoundary } from '../../utils/ErrorBoundary';
 import { SaveOutlined } from '@material-ui/icons';
-import CustomizedSnackbars from 'src/components/Toast/Toast';
+import CustomizedSnackbars from '../../components/Toast/Toast';
 import CancelPresentationOutlinedIcon from '@material-ui/icons/CancelPresentationOutlined';
 const { SimplusAuthRobin } = robins;
 
@@ -39,15 +40,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 //@ts-ignore
 @connectRobin([SimplusAuthRobin])
-const Home = (props: any) => {
-	const classes = useStyles();
+const VerifyCode = (props: any) => {
+	const classes = useStyles(props);
 	const [loading, setLoading] = React.useState(false);
 	const [notification, setNotification] = React.useState({
 		toastOpen: false,
 		toastVariant: undefined,
 		toastMessage: undefined
 	});
-	const [phoneNumber, setPhoneNumber] = useState('')
+	const [otpCode, setOtpCode] = useState('')
 
 	const handleToastClose = (_event?: SyntheticEvent, reason?: string) => {
 		if (reason === 'clickaway') {
@@ -62,21 +63,21 @@ const Home = (props: any) => {
 	}
 
 	const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setPhoneNumber(event.target.value);
+		setOtpCode(event.target.value);
 	};
 
-	const sendAndGenrateCode = (event: React.FormEvent) => {
-		setLoading(true);
-		event.preventDefault();
-		SimplusAuthRobin.when(SimplusAuthRobin.post('generateAndSendOTPCode', `/two-factor-authentication/generate-code`, {
-			phone_number: phoneNumber
+	const verifyCode = (event: React.FormEvent) => {
+        event.preventDefault();
+        const parsed = queryString.parse(props.history.location.search);
+        setLoading(true);
+		SimplusAuthRobin.when(SimplusAuthRobin.post('verifyOTPCode', `/two-factor-authentication/verify-code`, {
+			code: otpCode,
+            token: parsed.token
 		})).then(() => {
 			setLoading(false);
-			const updatedInfo = SimplusAuthRobin.getResult('generateAndSendOTPCode');
-			handleToastOpen('success', updatedInfo.message);
+			const updatedInfo = SimplusAuthRobin.getResult('verifyOTPCode');
 			console.log(updatedInfo)
-			props.history.push(`/admin/verify?token=${updatedInfo.data}`)
-			
+			handleToastOpen('success', updatedInfo.message);
 		}).catch(err => {
 			setLoading(false);
 			handleToastOpen('error', err.response.data.message)
@@ -94,27 +95,27 @@ const Home = (props: any) => {
 			<Grid container justify='center' alignItems='center'>
 				<Grid item xs={12}>
 					<Typography variant='h5' display='block' gutterBottom={true} style={{ textAlign: 'center'}}>
-						2FA Code Generation
+						2FA Code Verification
 					</Typography>
 				</Grid>
 				<Grid item xs={12}>
 					<Typography variant='caption' display='block' gutterBottom={true} style={{ textAlign: 'center'}}>
-						Generate 6 digit OTP and send it your phone number. 
+						Verify your 6 digit OTP code. 
 					</Typography>
 				</Grid>
 			</Grid>
-			<Grid container justify='center' alignItems='center'>
+            <Grid container justify='center' alignItems='center'>
 			{loading ? <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}><CircularProgress className={classes.progress} /></div> :
-			<form className={classes.form} autoComplete='off' onSubmit={sendAndGenrateCode}>
+			<form className={classes.form} autoComplete='off' onSubmit={verifyCode}>
 				<TextField
 					variant='outlined'
 					margin='normal'
 					required
 					fullWidth
-					id='phone_number'
-					label='Enter your phone number'
-					name='phone_number'
-					value={phoneNumber}
+					id='code'
+					label='Enter your OTP code'
+					name='code'
+					value={otpCode}
 					autoFocus
 					onChange={handleFormChange}
 				/>
@@ -138,7 +139,7 @@ const Home = (props: any) => {
 						type='submit'
 					>
 						<SaveOutlined className={clsx(classes.leftIcon, classes.iconSmall)} />
-						Send OTP
+						Verify OTP
 					</Button>
 				</div>
 			</form>
@@ -148,4 +149,4 @@ const Home = (props: any) => {
 	)
 };
 
-export default Home;
+export default VerifyCode;
